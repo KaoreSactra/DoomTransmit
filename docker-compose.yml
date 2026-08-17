@@ -7,14 +7,17 @@ services:
       - PORT=3000
     expose:
       - "3000"
+    networks:
+      - default
+      - tunnel
 
   caddy:
     image: caddy:2-alpine
     container_name: doomtransmit-caddy
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "8082:80"
+      - "8444:443"
     environment:
       - DOMAIN=${DOMAIN}
       - EMAIL=${EMAIL}
@@ -28,3 +31,7 @@ services:
 volumes:
   caddy_data:
   caddy_config:
+
+networks:
+  tunnel:
+    external: true

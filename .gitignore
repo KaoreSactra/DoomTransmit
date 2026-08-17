@@ -1,1 +1,18 @@
-node_modules
+# Dependências
+node_modules/
+
+# Variáveis de ambiente (nunca commitar segredos)
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+logs/
+*.log
+
+# Sistema operacional / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json

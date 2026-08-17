@@ -1,5 +1,6 @@
 {
 	email {$EMAIL}
+	default_sni {$DOMAIN}
 }
 
 {$DOMAIN} {
