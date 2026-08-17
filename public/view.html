@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DoomTransmit - Assistindo</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="card view-layout">
+      <h1 style="font-size: 22px">Assistindo transmissao</h1>
+      <div class="status">
+        <span id="statusDot" class="dot"></span
+        ><span id="statusText">Conectando...</span>
+      </div>
+
+      <video id="remoteVideo" autoplay playsinline controls></video>
+      <p id="emptyMsg" class="center-msg" style="display: none">
+        A transmissao ainda nao comecou ou foi encerrada.
+      </p>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="view.js"></script>
+  </body>
+</html>

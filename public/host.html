@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DoomTransmit - Transmitindo</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="card host-layout">
+      <div class="top-bar">
+        <h1 style="margin: 0; font-size: 22px">Sua transmissao</h1>
+        <button id="stopBtn" class="btn btn-danger">Encerrar</button>
+      </div>
+
+      <div class="status">
+        <span id="statusDot" class="dot"></span
+        ><span id="statusText">Iniciando...</span>
+      </div>
+      <div class="viewer-count" id="viewerCount">
+        0 espectador(es) conectado(s)
+      </div>
+
+      <div class="link-box">
+        <input id="linkInput" type="text" readonly />
+        <button id="copyBtn" class="copy-btn">Copiar link</button>
+      </div>
+
+      <video id="preview" autoplay muted playsinline></video>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="host.js"></script>
+  </body>
+</html>

@@ -1,0 +1,30 @@
+services:
+  app:
+    build: .
+    container_name: doomtransmit-app
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+    expose:
+      - "3000"
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: doomtransmit-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN}
+      - EMAIL=${EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  caddy_data:
+  caddy_config:
