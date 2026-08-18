@@ -91,14 +91,13 @@ O app fica disponível em `https://SEU_DOMINIO`. O Caddy cuida do certificado TL
 
 ### Variáveis de ambiente
 
-| Variável         | Descrição                                                                      | Onde é usada                      |
-| ---------------- | ------------------------------------------------------------------------------ | --------------------------------- |
-| `DOMAIN`         | Domínio público usado pelo Caddy para emitir o certificado HTTPS               | `docker-compose.yml`, `Caddyfile` |
-| `EMAIL`          | E-mail para registro no Let's Encrypt                                          | `docker-compose.yml`, `Caddyfile` |
-| `PORT`           | Porta interna do servidor Node (padrão `3000`)                                 | `server.js`, `docker-compose.yml` |
-| `AUTH_USER`      | Usuário exigido para acessar a tela de transmissão (host)                      | `server.js`                       |
-| `AUTH_PASSWORD`  | Senha exigida para acessar a tela de transmissão (host)                        | `server.js`                       |
-| `SESSION_SECRET` | String aleatória para assinar o cookie de sessão (ex.: `openssl rand -hex 32`) | `server.js`                       |
+| Variável         | Descrição                                                                                                                                                                                                                          | Onde é usada                      |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| `DOMAIN`         | Domínio público usado pelo Caddy para emitir o certificado HTTPS                                                                                                                                                                   | `docker-compose.yml`, `Caddyfile` |
+| `EMAIL`          | E-mail para registro no Let's Encrypt                                                                                                                                                                                              | `docker-compose.yml`, `Caddyfile` |
+| `PORT`           | Porta interna do servidor Node (padrão `3000`)                                                                                                                                                                                     | `server.js`, `docker-compose.yml` |
+| `AUTH_USERS`     | Lista de usuários/senhas para acessar a tela de transmissão (host), no formato `usuario1:"senha1",usuario2:"senha2"` (envolva tudo em aspas simples e cada senha em aspas duplas para evitar que `#` seja tratado como comentário) | `server.js`                       |
+| `SESSION_SECRET` | String aleatória para assinar o cookie de sessão (ex.: `openssl rand -hex 32`)                                                                                                                                                     | `server.js`                       |
 
 ## ⚙️ Adaptando para outro ambiente
 

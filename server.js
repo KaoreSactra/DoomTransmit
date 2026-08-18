@@ -10,13 +10,51 @@ const app = express()
 const server = http.createServer(app)
 
 const PORT = process.env.PORT || 3000
-const AUTH_USER = process.env.AUTH_USER || ""
-const AUTH_PASSWORD = process.env.AUTH_PASSWORD || ""
 const SESSION_SECRET = process.env.SESSION_SECRET || ""
 
-if (!AUTH_USER || !AUTH_PASSWORD || !SESSION_SECRET) {
+// remove aspas simples/duplas envolvendo o valor, ex: "senha#123" -> senha#123
+function stripQuotes(value) {
+  if (value.length >= 2) {
+    const first = value[0]
+    const last = value[value.length - 1]
+    if ((first === '"' || first === "'") && first === last) {
+      return value.slice(1, -1)
+    }
+  }
+  return value
+}
+
+// Formato: AUTH_USERS='usuario1:"senha1",usuario2:"senha2"'
+function parseUsers(raw) {
+  if (!raw) return []
+  return raw
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const separatorIndex = entry.indexOf(":")
+      if (separatorIndex === -1) return null
+      return {
+        username: stripQuotes(entry.slice(0, separatorIndex).trim()),
+        password: stripQuotes(entry.slice(separatorIndex + 1).trim()),
+      }
+    })
+    .filter((user) => user && user.username && user.password)
+}
+
+const AUTH_USERS = parseUsers(process.env.AUTH_USERS)
+
+// Compatibilidade com o formato antigo de usuario unico
+if (process.env.AUTH_USER && process.env.AUTH_PASSWORD) {
+  AUTH_USERS.push({
+    username: process.env.AUTH_USER,
+    password: process.env.AUTH_PASSWORD,
+  })
+}
+
+if (AUTH_USERS.length === 0 || !SESSION_SECRET) {
   console.warn(
-    "AVISO: defina AUTH_USER, AUTH_PASSWORD e SESSION_SECRET no .env para habilitar o login.",
+    "AVISO: defina AUTH_USERS (ex: usuario1:senha1,usuario2:senha2) e SESSION_SECRET no .env para habilitar o login.",
   )
 }
 
@@ -73,6 +111,21 @@ function registerFailedAttempt(ip) {
   }
 }
 
+function findMatchingUser(username, password) {
+  let matched = null
+  // percorre todos os usuarios (sem early-exit) para nao vazar timing por posicao
+  for (const user of AUTH_USERS) {
+    const userMatches =
+      typeof username === "string" && safeCompare(username, user.username)
+    const passwordMatches =
+      typeof password === "string" && safeCompare(password, user.password)
+    if (userMatches && passwordMatches) {
+      matched = user
+    }
+  }
+  return matched
+}
+
 app.post("/api/login", (req, res) => {
   const ip = req.ip
   if (isRateLimited(ip)) {
@@ -82,12 +135,9 @@ app.post("/api/login", (req, res) => {
   }
 
   const { username, password } = req.body || {}
-  const validUser =
-    typeof username === "string" && safeCompare(username, AUTH_USER)
-  const validPassword =
-    typeof password === "string" && safeCompare(password, AUTH_PASSWORD)
+  const matchedUser = findMatchingUser(username, password)
 
-  if (!validUser || !validPassword) {
+  if (!matchedUser) {
     registerFailedAttempt(ip)
     return res.status(401).json({ error: "Usuario ou senha invalidos." })
   }
@@ -96,6 +146,7 @@ app.post("/api/login", (req, res) => {
   req.session.regenerate((err) => {
     if (err) return res.status(500).json({ error: "Erro ao criar sessao." })
     req.session.authenticated = true
+    req.session.username = matchedUser.username
     res.json({ ok: true })
   })
 })
@@ -108,7 +159,10 @@ app.post("/api/logout", (req, res) => {
 })
 
 app.get("/api/session", (req, res) => {
-  res.json({ authenticated: Boolean(req.session?.authenticated) })
+  res.json({
+    authenticated: Boolean(req.session?.authenticated),
+    username: req.session?.username || null,
+  })
 })
 
 function requireAuth(req, res, next) {

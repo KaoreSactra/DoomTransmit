@@ -6,8 +6,7 @@ services:
     environment:
       - PORT=3000
       - NODE_ENV=production
-      - AUTH_USER=${AUTH_USER}
-      - AUTH_PASSWORD=${AUTH_PASSWORD}
+      - AUTH_USERS=${AUTH_USERS}
       - SESSION_SECRET=${SESSION_SECRET}
     expose:
       - "3000"

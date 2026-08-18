@@ -1,13 +1,16 @@
 :root {
-  --bg: #0f1117;
-  --panel: #171a23;
-  --border: #262b38;
-  --text: #e8eaf0;
-  --muted: #9aa1b2;
-  --accent: #4f7cff;
-  --accent-hover: #3d68f0;
+  --bg: #0a0b12;
+  --panel: rgba(23, 26, 35, 0.72);
+  --border: #2a2f3f;
+  --text: #eef0f7;
+  --muted: #98a0b3;
+  --accent: #7c5cff;
+  --accent-2: #4f7cff;
+  --accent-hover: #6a4bf0;
   --danger: #ff5566;
-  --ok: #38c977;
+  --danger-2: #ff2e6e;
+  --ok: #38e0a0;
+  --ring: rgba(124, 92, 255, 0.35);
 }
 
 * {
@@ -28,22 +31,73 @@ body {
   align-items: center;
   justify-content: center;
   padding: 24px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  width: 620px;
+  height: 620px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.28;
+  z-index: 0;
+  pointer-events: none;
+}
+
+body::before {
+  top: -220px;
+  left: -180px;
+  background: radial-gradient(circle, var(--accent), transparent 70%);
+}
+
+body::after {
+  bottom: -220px;
+  right: -180px;
+  background: radial-gradient(circle, var(--accent-2), transparent 70%);
 }
 
 .card {
+  position: relative;
+  z-index: 1;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 40px;
   max-width: 480px;
   width: 100%;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  animation: card-in 0.35s ease;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 h1 {
   margin: 0 0 8px;
   font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(120deg, var(--text) 30%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .subtitle {
@@ -54,14 +108,19 @@ h1 {
 
 .btn {
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 14px 24px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition:
-    background 0.15s ease,
-    transform 0.1s ease;
+    background 0.2s ease,
+    transform 0.12s ease,
+    box-shadow 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
 }
 
 .btn:active {
@@ -69,21 +128,25 @@ h1 {
 }
 
 .btn-primary {
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #fff;
+  box-shadow: 0 10px 24px rgba(124, 92, 255, 0.35);
 }
 
 .btn-primary:hover {
-  background: var(--accent-hover);
+  background: linear-gradient(135deg, var(--accent-hover), var(--accent-2));
+  box-shadow: 0 14px 32px rgba(124, 92, 255, 0.45);
 }
 
 .btn-danger {
-  background: var(--danger);
+  background: linear-gradient(135deg, var(--danger), var(--danger-2));
   color: #fff;
+  box-shadow: 0 10px 24px rgba(255, 46, 110, 0.3);
 }
 
 .btn-danger:hover {
-  background: #e03a4c;
+  background: linear-gradient(135deg, #ff2e4e, var(--danger-2));
+  box-shadow: 0 14px 32px rgba(255, 46, 110, 0.42);
 }
 
 .link-box {
@@ -95,11 +158,20 @@ h1 {
 .link-box input {
   flex: 1;
   padding: 12px 14px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid var(--border);
-  background: #0d0f15;
+  background: rgba(10, 11, 18, 0.7);
   color: var(--text);
   font-size: 14px;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.link-box input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
 }
 
 .status {
@@ -120,7 +192,18 @@ h1 {
 
 .dot.live {
   background: var(--ok);
-  box-shadow: 0 0 8px var(--ok);
+  box-shadow: 0 0 10px var(--ok);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 6px var(--ok);
+  }
+  50% {
+    box-shadow: 0 0 14px var(--ok);
+  }
 }
 
 .dot.error {
@@ -136,9 +219,10 @@ h1 {
 
 video {
   width: 100%;
-  border-radius: 10px;
+  border-radius: 14px;
   background: #000;
   display: block;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
 .host-layout,
@@ -157,16 +241,22 @@ video {
 
 .copy-btn {
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid var(--border);
-  background: #1f2430;
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text);
   cursor: pointer;
   font-size: 14px;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.12s ease;
 }
 
 .copy-btn:hover {
-  background: #262c3a;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent);
+  transform: translateY(-1px);
 }
 
 .center-msg {
