@@ -79,6 +79,8 @@ Pré-requisitos no servidor:
    ```env
    DOMAIN=seu-dominio-aqui.com
    EMAIL=seu-email@exemplo.com
+   AUTH_USERS='usuario1:"senha1",usuario2:"senha2"'
+   SESSION_SECRET=troque-por-uma-string-aleatoria-longa
    ```
 
 2. Suba os containers:
