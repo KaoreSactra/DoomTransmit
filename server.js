@@ -174,6 +174,22 @@ app.get(["/", "/index.html", "/host.html"], requireAuth, (req, res, next) =>
   next(),
 )
 
+app.use((req, res, next) => {
+  if (
+    req.path.endsWith(".html") ||
+    req.path.endsWith(".css") ||
+    req.path.endsWith(".js")
+  ) {
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, max-age=0",
+    )
+    res.setHeader("Pragma", "no-cache")
+    res.setHeader("Expires", "0")
+  }
+  next()
+})
+
 app.use(express.static(path.join(__dirname, "public")))
 
 const rooms = new Map()
