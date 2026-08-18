@@ -24,8 +24,8 @@
 
     <script>
       document.getElementById("startBtn").addEventListener("click", () => {
-        // cada usuario tem uma sala fixa propria, definida pelo servidor a partir do login
-        window.location.href = "/host.html"
+        const roomId = crypto.randomUUID().replace(/-/g, "").slice(0, 10)
+        window.location.href = `/host.html?room=${roomId}`
       })
 
       document

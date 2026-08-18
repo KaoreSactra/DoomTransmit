@@ -190,25 +190,15 @@ io.on("connection", (socket) => {
   let joinedRole = null
 
   socket.on("join-room", ({ roomId, role }) => {
-    if (role !== "host" && role !== "viewer") {
+    if (!roomId || (role !== "host" && role !== "viewer")) {
       socket.emit("join-error", { message: "Parametros invalidos." })
       return
     }
 
-    if (role === "host") {
-      const username = socket.request.session?.authenticated
-        ? socket.request.session.username
-        : null
-      if (!username) {
-        socket.emit("join-error", {
-          message: "Sessao expirada. Faca login novamente.",
-        })
-        return
-      }
-      // a sala do host e sempre a do proprio usuario, nunca um id arbitrario
-      roomId = username
-    } else if (!roomId) {
-      socket.emit("join-error", { message: "Parametros invalidos." })
+    if (role === "host" && !socket.request.session?.authenticated) {
+      socket.emit("join-error", {
+        message: "Sessao expirada. Faca login novamente.",
+      })
       return
     }
 

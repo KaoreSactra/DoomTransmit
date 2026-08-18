@@ -1,4 +1,5 @@
-let roomId = null
+const params = new URLSearchParams(window.location.search)
+const roomId = params.get("room")
 
 const sourceSelect = document.getElementById("sourceSelect")
 const broadcastPanel = document.getElementById("broadcastPanel")
@@ -13,6 +14,24 @@ const linkInput = document.getElementById("linkInput")
 const copyBtn = document.getElementById("copyBtn")
 const stopBtn = document.getElementById("stopBtn")
 const preview = document.getElementById("preview")
+
+if (!roomId) {
+  window.location.href = "/"
+}
+
+const viewUrl = `${window.location.origin}/view.html?room=${roomId}`
+linkInput.value = viewUrl
+
+copyBtn.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(viewUrl)
+    copyBtn.textContent = "Copiado!"
+    setTimeout(() => (copyBtn.textContent = "Copiar link"), 1500)
+  } catch {
+    linkInput.select()
+    document.execCommand("copy")
+  }
+})
 
 const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }]
 
@@ -98,39 +117,8 @@ logoutBtn.addEventListener("click", async () => {
 
 const socket = io()
 
-async function initRoom() {
-  try {
-    const res = await fetch("/api/session")
-    const data = await res.json()
-    if (!data.authenticated || !data.username) {
-      window.location.href = "/login.html"
-      return
-    }
-    // a sala e sempre a do usuario autenticado, sem link aleatorio
-    roomId = data.username
-    const viewUrl = `${window.location.origin}/view.html?room=${roomId}`
-    linkInput.value = viewUrl
-
-    copyBtn.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(viewUrl)
-        copyBtn.textContent = "Copiado!"
-        setTimeout(() => (copyBtn.textContent = "Copiar link"), 1500)
-      } catch {
-        linkInput.select()
-        document.execCommand("copy")
-      }
-    })
-
-    socket.emit("join-room", { roomId, role: "host" })
-  } catch (err) {
-    console.error("Erro ao obter sessao", err)
-    window.location.href = "/login.html"
-  }
-}
-
 socket.on("connect", () => {
-  initRoom()
+  socket.emit("join-room", { roomId, role: "host" })
 })
 
 socket.on("join-error", ({ message }) => {
