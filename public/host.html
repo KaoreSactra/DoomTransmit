@@ -8,25 +8,58 @@
   </head>
   <body>
     <main class="card host-layout">
-      <div class="top-bar">
-        <h1 style="margin: 0; font-size: 22px">Sua transmissao</h1>
-        <button id="stopBtn" class="btn btn-danger">Encerrar</button>
+      <div id="sourceSelect" class="source-select">
+        <h1 style="margin: 0 0 8px; font-size: 22px">
+          O que deseja compartilhar?
+        </h1>
+        <p class="subtitle" style="margin-bottom: 24px">
+          Escolha entre transmitir a tela inteira ou apenas um aplicativo
+          especifico (nesse caso, apenas o som do proprio aplicativo/janela e
+          transmitido).
+        </p>
+        <p
+          class="subtitle"
+          style="margin-top: -12px; margin-bottom: 24px; font-size: 13px"
+        >
+          ⚠️ Ao escolher "Um aplicativo", marque a caixa "Compartilhar audio" na
+          janela do navegador. Em algumas versoes do Chrome/Windows essa opcao
+          ainda captura o audio do sistema inteiro (limitacao do navegador, nao
+          do DoomTransmit) — se isso acontecer, use "Tela inteira".
+        </p>
+        <div class="source-options">
+          <button id="shareScreenBtn" class="btn btn-primary">
+            🖥️ Tela inteira
+          </button>
+          <button id="shareAppBtn" class="btn btn-primary">
+            🪟 Um aplicativo
+          </button>
+        </div>
       </div>
 
-      <div class="status">
-        <span id="statusDot" class="dot"></span
-        ><span id="statusText">Iniciando...</span>
-      </div>
-      <div class="viewer-count" id="viewerCount">
-        0 espectador(es) conectado(s)
-      </div>
+      <div id="broadcastPanel" class="hidden">
+        <div class="top-bar">
+          <h1 style="margin: 0; font-size: 22px">Sua transmissao</h1>
+          <div class="top-bar-actions">
+            <button id="switchSourceBtn" class="copy-btn">Trocar fonte</button>
+            <button id="stopBtn" class="btn btn-danger">Encerrar</button>
+          </div>
+        </div>
 
-      <div class="link-box">
-        <input id="linkInput" type="text" readonly />
-        <button id="copyBtn" class="copy-btn">Copiar link</button>
-      </div>
+        <div class="status">
+          <span id="statusDot" class="dot"></span
+          ><span id="statusText">Iniciando...</span>
+        </div>
+        <div class="viewer-count" id="viewerCount">
+          0 espectador(es) conectado(s)
+        </div>
 
-      <video id="preview" autoplay muted playsinline></video>
+        <div class="link-box">
+          <input id="linkInput" type="text" readonly />
+          <button id="copyBtn" class="copy-btn">Copiar link</button>
+        </div>
+
+        <video id="preview" autoplay muted playsinline></video>
+      </div>
     </main>
 
     <script src="/socket.io/socket.io.js"></script>

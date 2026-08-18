@@ -1,6 +1,11 @@
 const params = new URLSearchParams(window.location.search)
 const roomId = params.get("room")
 
+const sourceSelect = document.getElementById("sourceSelect")
+const broadcastPanel = document.getElementById("broadcastPanel")
+const shareScreenBtn = document.getElementById("shareScreenBtn")
+const shareAppBtn = document.getElementById("shareAppBtn")
+const switchSourceBtn = document.getElementById("switchSourceBtn")
 const statusDot = document.getElementById("statusDot")
 const statusText = document.getElementById("statusText")
 const viewerCountEl = document.getElementById("viewerCount")
@@ -134,19 +139,111 @@ socket.on("signal", ({ from, data }) => {
   }
 })
 
-async function start() {
-  try {
-    setStatus("Aguardando permissao de compartilhamento...")
-    localStream = await navigator.mediaDevices.getDisplayMedia({
-      video: true,
-      audio: true,
-    })
-    preview.srcObject = localStream
+function buildDisplayMediaConstraints(mode) {
+  const constraints = {
+    video: { displaySurface: mode === "app" ? "window" : "monitor" },
+    audio: true,
+    selfBrowserSurface: "exclude",
+    surfaceSwitching: "include",
+  }
 
-    localStream.getVideoTracks()[0].addEventListener("ended", stopSharing)
-  } catch (err) {
-    setStatus("Permissao negada ou compartilhamento cancelado.", "error")
+  if (mode === "app") {
+    // esconde a opcao de "tela inteira" e o audio do sistema, deixando so
+    // janelas/abas e o audio proprio do item escolhido
+    constraints.monitorTypeSurfaces = "exclude"
+    constraints.systemAudio = "exclude"
+    constraints.windowAudio = "window"
+  }
+
+  return constraints
+}
+
+function requestDisplayMedia(mode) {
+  return navigator.mediaDevices.getDisplayMedia(
+    buildDisplayMediaConstraints(mode),
+  )
+}
+
+async function replaceStreamOnPeers(newStream) {
+  const newVideoTrack = newStream.getVideoTracks()[0]
+  const newAudioTrack = newStream.getAudioTracks()[0]
+
+  for (const pc of peerConnections.values()) {
+    const senders = pc.getSenders()
+    const videoSender = senders.find((s) => s.track?.kind === "video")
+    const audioSender = senders.find((s) => s.track?.kind === "audio")
+
+    try {
+      if (videoSender && newVideoTrack) {
+        await videoSender.replaceTrack(newVideoTrack)
+      }
+    } catch (err) {
+      console.error("Falha ao trocar video de um espectador", err)
+    }
+
+    try {
+      if (newAudioTrack) {
+        if (audioSender) {
+          await audioSender.replaceTrack(newAudioTrack)
+        } else {
+          pc.addTrack(newAudioTrack, newStream)
+        }
+      } else if (audioSender) {
+        // fonte nova sem audio (ex.: janela sem "compartilhar audio" marcado):
+        // silencia em vez de continuar enviando o audio da fonte anterior
+        await audioSender.replaceTrack(null)
+      }
+    } catch (err) {
+      console.error("Falha ao trocar audio de um espectador", err)
+    }
   }
 }
 
-start()
+async function applyNewStream(mode) {
+  const isSwitch = Boolean(localStream)
+  setStatus(
+    isSwitch
+      ? "Trocando fonte..."
+      : "Aguardando permissao de compartilhamento...",
+  )
+
+  try {
+    const newStream = await requestDisplayMedia(mode)
+
+    if (isSwitch) {
+      await replaceStreamOnPeers(newStream)
+      localStream.getTracks().forEach((track) => track.stop())
+    }
+
+    localStream = newStream
+    preview.srcObject = localStream
+    localStream.getVideoTracks()[0].addEventListener("ended", stopSharing)
+    setStatus("Transmitindo ao vivo", "live")
+  } catch (err) {
+    console.error("Erro ao capturar/trocar fonte", err)
+    if (isSwitch) {
+      setStatus(`Troca cancelada (${err.name || "erro"})`, "error")
+      setTimeout(() => setStatus("Transmitindo ao vivo", "live"), 2500)
+    } else {
+      setStatus(
+        `Permissao negada ou cancelada (${err.name || "erro"}).`,
+        "error",
+      )
+    }
+  }
+}
+
+function onChooseSource(mode) {
+  const isInitial = broadcastPanel.classList.contains("hidden")
+  sourceSelect.classList.add("hidden")
+  if (isInitial) {
+    broadcastPanel.classList.remove("hidden")
+  }
+  applyNewStream(mode)
+}
+
+shareScreenBtn.addEventListener("click", () => onChooseSource("screen"))
+shareAppBtn.addEventListener("click", () => onChooseSource("app"))
+switchSourceBtn.addEventListener("click", () => {
+  sourceSelect.classList.remove("hidden")
+})

@@ -174,3 +174,24 @@ video {
   text-align: center;
   padding: 60px 0;
 }
+
+.hidden {
+  display: none !important;
+}
+
+.source-select {
+  text-align: center;
+}
+
+.source-options {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.top-bar-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}

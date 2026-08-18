@@ -16,8 +16,8 @@ services:
     container_name: doomtransmit-caddy
     restart: unless-stopped
     ports:
-      - "8082:80"
-      - "8444:443"
+      - "80:80"
+      - "443:443"
     environment:
       - DOMAIN=${DOMAIN}
       - EMAIL=${EMAIL}
