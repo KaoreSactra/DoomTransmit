@@ -6,6 +6,7 @@ const broadcastPanel = document.getElementById("broadcastPanel")
 const shareScreenBtn = document.getElementById("shareScreenBtn")
 const shareAppBtn = document.getElementById("shareAppBtn")
 const switchSourceBtn = document.getElementById("switchSourceBtn")
+const logoutBtn = document.getElementById("logoutBtn")
 const statusDot = document.getElementById("statusDot")
 const statusText = document.getElementById("statusText")
 const viewerCountEl = document.getElementById("viewerCount")
@@ -92,17 +93,27 @@ async function handleIceCandidate(viewerId, candidate) {
   }
 }
 
-function stopSharing() {
+function cleanupStream() {
   if (localStream) {
     localStream.getTracks().forEach((track) => track.stop())
   }
   peerConnections.forEach((pc) => pc.close())
   peerConnections.clear()
   socket.disconnect()
+}
+
+function stopSharing() {
+  cleanupStream()
   window.location.href = "/"
 }
 
 stopBtn.addEventListener("click", stopSharing)
+
+logoutBtn.addEventListener("click", async () => {
+  cleanupStream()
+  await fetch("/api/logout", { method: "POST" })
+  window.location.href = "/login.html"
+})
 
 const socket = io()
 

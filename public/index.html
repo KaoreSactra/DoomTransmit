@@ -15,6 +15,11 @@
       <button id="startBtn" class="btn btn-primary">
         Iniciar compartilhamento
       </button>
+      <p style="margin-top: 20px">
+        <a id="logoutLink" href="#" style="color: var(--muted); font-size: 13px"
+          >Sair</a
+        >
+      </p>
     </main>
 
     <script>
@@ -22,6 +27,14 @@
         const roomId = crypto.randomUUID().replace(/-/g, "").slice(0, 10)
         window.location.href = `/host.html?room=${roomId}`
       })
+
+      document
+        .getElementById("logoutLink")
+        .addEventListener("click", async (event) => {
+          event.preventDefault()
+          await fetch("/api/logout", { method: "POST" })
+          window.location.href = "/login.html"
+        })
     </script>
   </body>
 </html>

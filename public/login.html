@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DoomTransmit - Login</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="card">
+      <h1>DoomTransmit</h1>
+      <p class="subtitle">Entre com suas credenciais para transmitir.</p>
+
+      <form id="loginForm">
+        <div
+          class="link-box"
+          style="flex-direction: column; align-items: stretch"
+        >
+          <input
+            id="username"
+            type="text"
+            placeholder="Usuario"
+            autocomplete="username"
+            required
+          />
+        </div>
+        <div
+          class="link-box"
+          style="flex-direction: column; align-items: stretch"
+        >
+          <input
+            id="password"
+            type="password"
+            placeholder="Senha"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+        <p
+          id="errorMsg"
+          class="subtitle"
+          style="color: var(--danger); min-height: 20px"
+        ></p>
+        <button type="submit" class="btn btn-primary" style="width: 100%">
+          Entrar
+        </button>
+      </form>
+    </main>
+
+    <script src="login.js"></script>
+  </body>
+</html>
